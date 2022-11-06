@@ -1,0 +1,41 @@
+name: CD
+on:
+  repository_dispatch:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - src/**
+      - .github/**
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run_server_deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Sleep for 45 seconds
+        run: sleep 45s
+
+      - name: Run mainServer Playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: src/mainServer/setup.yml
+          options: |
+            --extra-vars docker_username=${{ github.actor }}
+            --extra-vars docker_password=${{ secrets.PAT_READ_PACKAGES }}
+            --extra-vars environment_variable_one=${{ secrets.ENVIRONMENT_VARIABLE_ONE }}
+            --extra-vars environment_variable_two=${{ secrets.ENVIRONMENT_VARIABLE_TWO }}
+            --extra-vars environment_variable_three=${{ secrets.ENVIRONMENT_VARIABLE_THREE }}
+          inventory: |
+            [all]
+            ${{secrets.IP_ADDRESS}} ansible_ssh_pass=${{secrets.MAIN_SERVER_SSH_PASS}} ansible_ssh_user=${{secrets.MAIN_SERVER_SSH_USER}}
+            
+            [mainServer]
+            ${{secrets.IP_ADDRESS}} ansible_ssh_pass=${{secrets.MAIN_SERVER_SSH_PASS}} ansible_ssh_user=${{secrets.MAIN_SERVER_SSH_USER}}

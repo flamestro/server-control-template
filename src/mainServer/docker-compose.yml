@@ -1,0 +1,76 @@
+version: "3.8"
+name: ServerControl
+services:
+
+  #
+  #     GAME SERVERS (Minecraft Server Example)
+  #
+
+  minecraft-server:
+    image: itzg/minecraft-bedrock-server
+    restart: always
+    cpus: 2
+    mem_reservation: "400M"
+    mem_limit: "2000M"
+    environment:
+      EULA: "TRUE"
+      SERVER_NAME: "Playground"
+      MAX_PLAYERS: 5
+      VIEW_DISTANCE: 10
+      GAMEMODE: survival
+      DIFFICULTY: normal
+      HTTP_PORT: 19132
+      VIRTUAL_HOST: your.domain.com
+      LETSENCRYPT_HOST: your.domain.com
+      LETSENCRYPT_EMAIL: "your@domain.com"
+    ports:
+      - 19132:19132/udp
+    volumes:
+      - minecraft-server:/data
+    stdin_open: true
+    tty: true
+
+  #
+  #     SSL SETUP
+  #
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+      - 443:443
+    container_name: nginx-proxy
+    networks:
+      service_network:
+    cpus: 0.5
+    mem_reservation: "10M"
+    mem_limit: "500M"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - nginx-certs:/etc/nginx/certs
+      - nginx-vhost:/etc/nginx/vhost.d
+      - nginx-html:/usr/share/nginx/html
+
+  nginx-proxy-letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    environment:
+      NGINX_PROXY_CONTAINER: "nginx-proxy"
+    networks:
+      service_network:
+    cpus: 0.1
+    mem_reservation: "10M"
+    mem_limit: "100M"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nginx-certs:/etc/nginx/certs
+      - nginx-vhost:/etc/nginx/vhost.d
+      - nginx-html:/usr/share/nginx/html
+
+networks:
+  service_network:
+
+volumes:
+  nginx-certs:
+  nginx-vhost:
+  nginx-html:
+  minecraft-server: {}

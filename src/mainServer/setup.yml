@@ -1,0 +1,99 @@
+---
+- hosts: mainServer
+  become: true
+  vars:
+    docker_compose_dir: ~/docker-compose
+    docker_username: placeholder
+    docker_password: placeholder
+    environment_variable_one: placeholder
+    environment_variable_two: placeholder
+    environment_variable_three: placeholder
+    docker_registry: ghcr.io
+
+  tasks:
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gpg
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+          - software-properties-common
+        state: latest
+        update_cache: true
+
+    - name: Update and upgrade apt packages
+      become: true
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu jammy stable
+        state: present
+
+    - name: install docker
+      apt:
+        name: "{{item}}"
+        state: latest
+        update_cache: yes
+      loop:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-compose-plugin
+
+    - name: check if docker is started
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Creates directory
+      file:
+        path: "{{ docker_compose_dir }}"
+        state: directory
+
+    - name: copy Docker Compose files
+      copy:
+        src: ./{{ item }}
+        dest: "{{ docker_compose_dir }}/{{ item }}"
+      loop:
+        - docker-compose.yml
+
+    - name: Log into private registry and force re-authorization
+      docker_login:
+        registry: "{{ docker_registry }}"
+        username: "{{ docker_username }}"
+        password: "{{ docker_password }}"
+        reauthorize: yes
+
+    - name: Creating a file with content
+      copy:
+        dest: "{{ docker_compose_dir }}/.env"
+        content: |
+          ENVIRONMENT_VARIABLE_ONE={{ environment_variable_one }}
+          ENVIRONMENT_VARIABLE_TWO={{ environment_variable_two }}
+          ENVIRONMENT_VARIABLE_THREE={{ environment_variable_three }}
+
+    - name: Run Docker Compose file
+      become: True
+      shell:
+        cmd: "docker compose --env-file .env -f docker-compose.yml up -d"
+        chdir: "{{ docker_compose_dir }}"
