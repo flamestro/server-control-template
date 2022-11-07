@@ -3,32 +3,27 @@ name: ServerControl
 services:
 
   #
-  #     GAME SERVERS (Minecraft Server Example)
+  #    EXAMPLE SETUP
   #
 
-  minecraft-server:
-    image: itzg/minecraft-bedrock-server
-    restart: always
-    cpus: 2
-    mem_reservation: "400M"
-    mem_limit: "2000M"
+  application:
+    image: ghcr.io/flamestro/example-application:main
+    pull_policy: always
+    expose:
+     - 8080
+    networks:
+      service_network:
+    cpus: 0.6
+    mem_reservation: "200M"
+    mem_limit: "600M"
     environment:
-      EULA: "TRUE"
-      SERVER_NAME: "Playground"
-      MAX_PLAYERS: 5
-      VIEW_DISTANCE: 10
-      GAMEMODE: survival
-      DIFFICULTY: normal
-      HTTP_PORT: 19132
+      ENV_VAR_ONE: ${ENVIRONMENT_VARIABLE_ONE}
+      ENV_VAR_TWO: ${ENVIRONMENT_VARIABLE_TWO}
+      ENV_VAR_THREE: ${ENVIRONMENT_VARIABLE_THREE}
+      HTTP_PORT: 8080
       VIRTUAL_HOST: your.domain.com
       LETSENCRYPT_HOST: your.domain.com
       LETSENCRYPT_EMAIL: "your@domain.com"
-    ports:
-      - 19132:19132/udp
-    volumes:
-      - minecraft-server:/data
-    stdin_open: true
-    tty: true
 
   #
   #     SSL SETUP
