@@ -18,8 +18,6 @@ services:
     mem_limit: "600M"
     environment:
       ENV_VAR_ONE: ${ENVIRONMENT_VARIABLE_ONE}
-      ENV_VAR_TWO: ${ENVIRONMENT_VARIABLE_TWO}
-      ENV_VAR_THREE: ${ENVIRONMENT_VARIABLE_THREE}
       HTTP_PORT: 8080
       VIRTUAL_HOST: your.domain.com
       LETSENCRYPT_HOST: your.domain.com
