@@ -12,8 +12,6 @@ This is a template repo.
 | MAIN_SERVER_SSH_USER       | Your servers user name (ssh)                                                          |
 | IP_ADDRESS                 | Your servers ip address                                                               |
 | ENVIRONMENT_VARIABLE_ONE   | If you need environment variables for your apps, this is how to pass the vars to them |
-| ENVIRONMENT_VARIABLE_TWO   | If you need environment variables for your apps, this is how to pass the vars to them |
-| ENVIRONMENT_VARIABLE_THREE | If you need environment variables for your apps, this is how to pass the vars to them |
 
 ## Clear orphaned containers
 
