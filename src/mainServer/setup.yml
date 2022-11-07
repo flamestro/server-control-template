@@ -6,8 +6,6 @@
     docker_username: placeholder
     docker_password: placeholder
     environment_variable_one: placeholder
-    environment_variable_two: placeholder
-    environment_variable_three: placeholder
     docker_registry: ghcr.io
 
   tasks:
@@ -89,8 +87,6 @@
         dest: "{{ docker_compose_dir }}/.env"
         content: |
           ENVIRONMENT_VARIABLE_ONE={{ environment_variable_one }}
-          ENVIRONMENT_VARIABLE_TWO={{ environment_variable_two }}
-          ENVIRONMENT_VARIABLE_THREE={{ environment_variable_three }}
 
     - name: Run Docker Compose file
       become: True
