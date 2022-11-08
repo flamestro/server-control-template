@@ -14,5 +14,4 @@ This is a template repo.
 | ENVIRONMENT_VARIABLE_ONE   | If you need environment variables for your apps, this is how to pass the vars to them |
 
 ## Clear orphaned containers
-
-Manually connect over ssh and run `docker rm -f $(docker ps -a -q)`
+Your server might get some orphaned containers over time. You can clear them by manually connecting to your server via ssh and running the following command `docker rm -f $(docker ps -a -q)`
